@@ -113,8 +113,8 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
             {
                 if(wsMessage!=null && wsMessage.upgradeRequest()!=null)
                 {
-                    copyMe.append(String.format("__%s", wsMessage.upgradeRequest().url()));
-                    copyMe.append(String.format(" (%s)__\n\n", wsMessage.direction().toString()));
+                    copyMe.append(String.format("**%s", wsMessage.upgradeRequest().url()));
+                    copyMe.append(String.format(" (%s)**\n\n", wsMessage.direction().toString()));
                     copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(wsMessage.payload().getBytes())));
                 }
             }
@@ -145,7 +145,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
             for (HttpRequestResponse requestResponse : targetRequestResponses) {
 
                 if (requestResponse.request() != null) {
-                    copyMe.append(String.format("__%s__\n\n", requestResponse.url()));
+                    copyMe.append(String.format("**%s**\n\n", requestResponse.request().url()));
                     copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(requestResponse.request().toByteArray().getBytes())));
                 }
 
