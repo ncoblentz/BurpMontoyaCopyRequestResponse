@@ -3,6 +3,8 @@ package com.nickcoblentz.montoya.utils;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.ToolType;
 import burp.api.montoya.http.message.HttpRequestResponse;
+import burp.api.montoya.http.message.requests.HttpRequest;
+import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.ui.contextmenu.*;
 
 import javax.swing.*;
@@ -28,6 +30,9 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
     private static String _CopyRequestAndResponseHeaderName = "Request (Full), Response (Header)";
     private JMenuItem _CopyRequestAndResponseJMenuItem = new JMenuItem(_CopyRequestAndResponseName);
     private JMenuItem _CopyRequestAndResponseHeaderJMenuItem = new JMenuItem(_CopyRequestAndResponseHeaderName);
+
+    private Set<String> _requestHeadersToStrip = Set.of("Sec-Ch-Ua","Sec-Ch-Ua-Mobile","Sec-Ch-Ua-Full-Version","Sec-Ch-Ua-Arch","Sec-Ch-Ua-Platform","Sec-Ch-Ua-Platform-Version","Sec-Ch-Ua-Model","Sec-Ch-Ua-Bitness","Sec-Ch-Ua-Wow64","Sec-Ch-Ua-Full-Version-List","Upgrade-Insecure-Requests","Sec-Fetch-Site","Sec-Fetch-Mode","Sec-Fetch-User","Sec-Fetch-Dest","Priority");
+    private Set<String> _responseHeadersToStrip = Set.of("Accept-Ch","P3p");
 
     public CopyRequestResponseContextMenuProvider(MontoyaApi api)
     {
@@ -146,14 +151,30 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
 
                 if (requestResponse.request() != null) {
                     copyMe.append(String.format("**%s**\n\n", requestResponse.request().url()));
-                    copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(requestResponse.request().toByteArray().getBytes())));
+                    HttpRequest strippedRequest = requestResponse.request();
+                    for(String headerName : _requestHeadersToStrip) {
+                        while (strippedRequest.hasHeader(headerName)) {
+                            strippedRequest = strippedRequest.withRemovedHeader(headerName);
+                        }
+                    }
+                    copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedRequest.toByteArray().getBytes())));
                 }
 
                 if (requestResponse.response() != null) {
+                    HttpResponse strippedResponse = requestResponse.response();
+
+                    for(String headerName : _responseHeadersToStrip){
+
+                        while(strippedResponse.hasHeader(headerName))
+                        {
+                            strippedResponse=strippedResponse.withRemovedHeader(headerName);
+                        }
+                    };
+
                     if (e.getActionCommand().equals(this._CopyRequestAndResponseName)) {
-                        copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(requestResponse.response().toByteArray().getBytes())));
+                        copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedResponse.toByteArray().getBytes())));
                     } else {
-                        byte[] responseHeaders = Arrays.copyOfRange(requestResponse.response().toByteArray().getBytes(), 0, requestResponse.response().bodyOffset());
+                        byte[] responseHeaders = Arrays.copyOfRange(strippedResponse.toByteArray().getBytes(), 0, strippedResponse.bodyOffset());
                         copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(responseHeaders)));
                     }
                 }

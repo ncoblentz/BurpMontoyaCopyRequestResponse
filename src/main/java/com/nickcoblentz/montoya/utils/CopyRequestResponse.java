@@ -31,6 +31,13 @@ public class CopyRequestResponse implements BurpExtension {
         _api = api;
         api.extension().setName("Copy Request/Response");
         _contextItemsProviderRegistration = api.userInterface().registerContextMenuItemsProvider(new CopyRequestResponseContextMenuProvider(api));
+/*
+        api.logging().logToOutput(api.persistence().preferences().getString("com.nickcoblentz.montoya.explorepreferences.keyname"));
+        api.persistence().preferences().stringKeys().forEach(key ->{
+            api.logging().logToOutput(key);
+        });
+
+ */
     }
 
 
