@@ -1,12 +1,14 @@
 plugins {
     id("java")
     `maven-publish`
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "org.nickcoblentz.montoya.utilities"
-version = "1.2"
+version = "1.3"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -14,6 +16,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("net.portswigger.burp.extensions:montoya-api:+")
+    implementation("com.nickcoblentz.montoya:MontoyaLibrary:0.1.4")
 
 }
 

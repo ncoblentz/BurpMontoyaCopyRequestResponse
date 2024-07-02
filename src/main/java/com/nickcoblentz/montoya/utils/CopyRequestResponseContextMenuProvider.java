@@ -6,6 +6,7 @@ import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.ui.contextmenu.*;
+import com.nickcoblentz.montoya.MontoyaLogger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,22 +27,51 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
     private int _EventType=0;
     private static int _EventTypeHTTP=1;
     private static int _EventTypeWS=2;
-    private static String _CopyRequestAndResponseName = "Full Request/Response";
-    private static String _CopyRequestAndResponseHeaderName = "Request (Full), Response (Header)";
+    private static String _CopyRequestAndResponseName = "Full Rq/Rs";
+    private static String _CopyRequestAndResponseHeaderName = "Full Rq, Rs Header";
+    private static String _CopyURLAndResponseName = "URL, Rs";
+    private static String _CopyURLAndResponseHeaderName = "URL, Rs Header";
     private JMenuItem _CopyRequestAndResponseJMenuItem = new JMenuItem(_CopyRequestAndResponseName);
     private JMenuItem _CopyRequestAndResponseHeaderJMenuItem = new JMenuItem(_CopyRequestAndResponseHeaderName);
+    private JMenuItem _CopyURLAndResponseJMenuItem = new JMenuItem(_CopyURLAndResponseName);
+    private JMenuItem _CopyURLAndResponseHeadersJMenuItem = new JMenuItem(_CopyURLAndResponseHeaderName);
 
-    private Set<String> _requestHeadersToStrip = Set.of("Sec-Ch-Ua","Sec-Ch-Ua-Mobile","Sec-Ch-Ua-Full-Version","Sec-Ch-Ua-Arch","Sec-Ch-Ua-Platform","Sec-Ch-Ua-Platform-Version","Sec-Ch-Ua-Model","Sec-Ch-Ua-Bitness","Sec-Ch-Ua-Wow64","Sec-Ch-Ua-Full-Version-List","Upgrade-Insecure-Requests","Sec-Fetch-Site","Sec-Fetch-Mode","Sec-Fetch-User","Sec-Fetch-Dest","Priority");
-    private Set<String> _responseHeadersToStrip = Set.of("Accept-Ch","P3p");
+    private Set<String> _requestHeadersToStrip = Set.of(
+            "Sec-Ch-Ua",
+            "Sec-Ch-Ua-Mobile",
+            "Sec-Ch-Ua-Full-Version",
+            "Sec-Ch-Ua-Arch",
+            "Sec-Ch-Ua-Platform",
+            "Sec-Ch-Ua-Platform-Version",
+            "Sec-Ch-Ua-Model",
+            "Sec-Ch-Ua-Bitness",
+            "Sec-Ch-Ua-Wow64",
+            "Sec-Ch-Ua-Full-Version-List",
+            "Upgrade-Insecure-Requests",
+            "Sec-Fetch-Site",
+            "Sec-Fetch-Mode",
+            "Sec-Fetch-User",
+            "Sec-Fetch-Dest",
+            "Priority");
+
+    private Set<String> _responseHeadersToStrip = Set.of(
+            "Accept-Ch",
+            "P3p");
+
+    MontoyaLogger logger = new MontoyaLogger(_api,MontoyaLogger.DebugLogLevel);
 
     public CopyRequestResponseContextMenuProvider(MontoyaApi api)
     {
         _api=api;
         _CopyRequestAndResponseHeaderJMenuItem.addActionListener(this);
         _CopyRequestAndResponseJMenuItem.addActionListener(this);
+        _CopyURLAndResponseJMenuItem.addActionListener(this);
+        _CopyURLAndResponseHeadersJMenuItem.addActionListener(this);
         _MenuItemList = new ArrayList<Component>();
         _MenuItemList.add(_CopyRequestAndResponseJMenuItem);
         _MenuItemList.add(_CopyRequestAndResponseHeaderJMenuItem);
+        _MenuItemList.add(_CopyURLAndResponseJMenuItem);
+        _MenuItemList.add(_CopyURLAndResponseHeadersJMenuItem);
     }
     @Override
     public List<Component> provideMenuItems(ContextMenuEvent event) {
@@ -151,13 +181,15 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
 
                 if (requestResponse.request() != null) {
                     copyMe.append(String.format("**%s**\n\n", requestResponse.request().url()));
-                    HttpRequest strippedRequest = requestResponse.request();
-                    for(String headerName : _requestHeadersToStrip) {
-                        while (strippedRequest.hasHeader(headerName)) {
-                            strippedRequest = strippedRequest.withRemovedHeader(headerName);
+                    if(e.getActionCommand().equals(this._CopyRequestAndResponseHeaderName) || e.getActionCommand().equals(this._CopyRequestAndResponseName)) {
+                        HttpRequest strippedRequest = requestResponse.request();
+                        for (String headerName : _requestHeadersToStrip) {
+                            while (strippedRequest.hasHeader(headerName)) {
+                                strippedRequest = strippedRequest.withRemovedHeader(headerName);
+                            }
                         }
+                        copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedRequest.toByteArray().getBytes())));
                     }
-                    copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedRequest.toByteArray().getBytes())));
                 }
 
                 if (requestResponse.response() != null) {
@@ -171,7 +203,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
                         }
                     };
 
-                    if (e.getActionCommand().equals(this._CopyRequestAndResponseName)) {
+                    if (e.getActionCommand().equals(this._CopyRequestAndResponseName) || e.getActionCommand().equals(this._CopyURLAndResponseName)) {
                         copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedResponse.toByteArray().getBytes())));
                     } else {
                         byte[] responseHeaders = Arrays.copyOfRange(strippedResponse.toByteArray().getBytes(), 0, strippedResponse.bodyOffset());
