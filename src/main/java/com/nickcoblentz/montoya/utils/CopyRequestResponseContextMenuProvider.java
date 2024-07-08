@@ -33,6 +33,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
     private static String _CopyURLAndResponseHeaderName = "URL, Rs Header";
     private static String _CopyRequestAndResponseIncludeName = "Full Rq/Rs (incl. all)";
     private static String _CopyURLAndResponseHeaderIncludeName = "URL, Rs Header (incl. all)";
+    private static String _CopyResponseBodyOnlyName = "Rs Body Only";
     private static List<String> _StripHeadersForTheseCommands = List.of(_CopyRequestAndResponseName,_CopyRequestAndResponseHeaderName,_CopyURLAndResponseName,_CopyURLAndResponseHeaderName);
     private JMenuItem _CopyRequestAndResponseJMenuItem = new JMenuItem(_CopyRequestAndResponseName);
     private JMenuItem _CopyRequestAndResponseHeaderJMenuItem = new JMenuItem(_CopyRequestAndResponseHeaderName);
@@ -40,6 +41,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
     private JMenuItem _CopyURLAndResponseHeadersJMenuItem = new JMenuItem(_CopyURLAndResponseHeaderName);
     private JMenuItem _CopyRequestAndResponseIncludeJMenuItem = new JMenuItem(_CopyRequestAndResponseIncludeName);
     private JMenuItem _CopyURLAndResponseHeaderIncludeJMenuItem = new JMenuItem(_CopyURLAndResponseHeaderIncludeName);
+    private JMenuItem _CopyResponseBodyOnlyJMenuItem = new JMenuItem(_CopyResponseBodyOnlyName);
 
     private Set<String> _requestHeadersToStrip = Set.of(
             "Sec-Ch-Ua",
@@ -86,6 +88,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
         _CopyURLAndResponseHeadersJMenuItem.addActionListener(this);
         _CopyRequestAndResponseIncludeJMenuItem.addActionListener(this);
         _CopyURLAndResponseHeaderIncludeJMenuItem.addActionListener(this);
+        _CopyResponseBodyOnlyJMenuItem.addActionListener(this);
         _MenuItemList = new ArrayList<Component>();
         _MenuItemList.add(_CopyRequestAndResponseJMenuItem);
         _MenuItemList.add(_CopyRequestAndResponseHeaderJMenuItem);
@@ -93,6 +96,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
         _MenuItemList.add(_CopyURLAndResponseHeadersJMenuItem);
         _MenuItemList.add(_CopyRequestAndResponseIncludeJMenuItem);
         _MenuItemList.add(_CopyURLAndResponseHeaderIncludeJMenuItem);
+        _MenuItemList.add(_CopyResponseBodyOnlyJMenuItem);
     }
     @Override
     public List<Component> provideMenuItems(ContextMenuEvent event) {
@@ -201,7 +205,8 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
             for (HttpRequestResponse requestResponse : targetRequestResponses) {
 
                 if (requestResponse.request() != null) {
-                    copyMe.append(String.format("**%s**\n\n", requestResponse.request().url()));
+                    if(!e.getActionCommand().equals(_CopyResponseBodyOnlyName))
+                        copyMe.append(String.format("**%s**\n\n", requestResponse.request().url()));
                     if(e.getActionCommand().equals(this._CopyRequestAndResponseHeaderName) || e.getActionCommand().equals(this._CopyRequestAndResponseName) || e.getActionCommand().equals(this._CopyRequestAndResponseIncludeName)) {
                         HttpRequest strippedRequest = requestResponse.request();
                         if(stripHeaders(e.getActionCommand())) {
@@ -227,7 +232,11 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
                         }
                     }
 
-                    if (e.getActionCommand().equals(this._CopyRequestAndResponseName) || e.getActionCommand().equals(this._CopyURLAndResponseName) || e.getActionCommand().equals(_CopyRequestAndResponseIncludeName)) {
+                    if(e.getActionCommand().equals(_CopyResponseBodyOnlyName)) {
+
+                        copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedResponse.body().getBytes())));
+                    }
+                    else if (e.getActionCommand().equals(this._CopyRequestAndResponseName) || e.getActionCommand().equals(this._CopyURLAndResponseName) || e.getActionCommand().equals(_CopyRequestAndResponseIncludeName)) {
                         copyMe.append(this.surroundWithMarkdown(_api.utilities().byteUtils().convertToString(strippedResponse.toByteArray().getBytes())));
                     } else {
                         byte[] responseHeaders = Arrays.copyOfRange(strippedResponse.toByteArray().getBytes(), 0, strippedResponse.bodyOffset());
