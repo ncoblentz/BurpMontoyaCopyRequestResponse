@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.nickcoblentz.montoya.utilities"
-version = "1.3"
+version = "1.4"
 
 repositories {
     mavenLocal()

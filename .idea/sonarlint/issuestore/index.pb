@@ -9,3 +9,6 @@ C
 Xsrc/main/java/com/nickcoblentz/montoya/utils/CopyRequestResponseContextMenuProvider.java,d\f\dfac2341465bd4f22446ca956d229c66fe7c7e73
 u
 Esrc/main/java/com/nickcoblentz/montoya/utils/CopyRequestResponse.java,3\d\3d549deb589b915537527bf9de4554788c6ef82e
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
