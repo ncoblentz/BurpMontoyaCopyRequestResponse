@@ -1,5 +1,7 @@
-# Burp CopyRequestResponse (Using the Montoya API)
-__Author: Nick Coblentz__
+# Burp Copy Request/Response (Using the Montoya API)
+_By [Nick Coblentz](https://www.linkedin.com/in/ncoblentz/)_
+
+__The Copy Request/Response Burp Extension is made possible by [Virtue Security](https://www.virtuesecurity.com), the Application Penetration Testing consulting company I work for.__
 
 CopyRequestResponse is a Burp Suite plugin that exposes a context-menu (right-click -> Extensions -> CopyRequest/Response) to copy one or more selected HTTP1/2 or Web Socket requests and paste it as markdown into your notes. 
 
