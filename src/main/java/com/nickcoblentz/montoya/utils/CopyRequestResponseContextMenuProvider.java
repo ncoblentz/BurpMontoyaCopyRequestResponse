@@ -6,6 +6,7 @@ import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.ui.contextmenu.*;
+import com.nickcoblentz.montoya.LogLevel;
 import com.nickcoblentz.montoya.MontoyaLogger;
 
 import javax.swing.*;
@@ -77,7 +78,7 @@ public class CopyRequestResponseContextMenuProvider implements ContextMenuItemsP
             "Content-Security-Policy",
             "Strict-Transport-Security");
 
-    MontoyaLogger logger = new MontoyaLogger(_api,MontoyaLogger.DebugLogLevel);
+    MontoyaLogger logger = new MontoyaLogger(_api, LogLevel.DEBUG);
 
     public CopyRequestResponseContextMenuProvider(MontoyaApi api)
     {

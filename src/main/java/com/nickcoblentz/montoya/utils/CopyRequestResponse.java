@@ -7,6 +7,7 @@ import burp.api.montoya.core.Registration;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.contextmenu.ContextMenuEvent;
+import com.nickcoblentz.montoya.LogLevel;
 import com.nickcoblentz.montoya.MontoyaLogger;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ public class CopyRequestResponse implements BurpExtension {
     public void initialize(MontoyaApi api)
     {
         _api = api;
-        MontoyaLogger logger = new MontoyaLogger(api,MontoyaLogger.DebugLogLevel);
+        MontoyaLogger logger = new MontoyaLogger(api, LogLevel.DEBUG);
         logger.debugLog(this.getClass().getName(),"Plugin Starting...");
         api.extension().setName("Copy Request/Response");
         _contextItemsProviderRegistration = api.userInterface().registerContextMenuItemsProvider(new CopyRequestResponseContextMenuProvider(api));
