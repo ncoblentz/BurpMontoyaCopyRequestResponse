@@ -75,7 +75,10 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
         "X-XSS-Protection",
         "X-Content-Type-Options",
         "Content-Security-Policy",
-        "Strict-Transport-Security"
+        "Strict-Transport-Security",
+        "Last-Modified",
+        "Vary",
+        "X-Ua-Compatible"
     )
 
     var logger: MontoyaLogger = MontoyaLogger(_api, LogLevel.DEBUG)
@@ -190,7 +193,7 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
                         var strippedRequest = requestResponse.request()
                         if (stripHeaders(e.actionCommand)) {
                             for (headerName in _requestHeadersToStrip) {
-                                while (strippedRequest.hasHeader(headerName)) {
+                                if(strippedRequest.hasHeader(headerName)) {
                                     strippedRequest = strippedRequest.withRemovedHeader(headerName)
                                 }
                             }
@@ -207,7 +210,7 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
                     var strippedResponse = requestResponse.response()
                     if (stripHeaders(e.actionCommand)) {
                         for (headerName in _responseHeadersToStrip) {
-                            while (strippedResponse.hasHeader(headerName)) {
+                            if(strippedResponse.hasHeader(headerName)) {
                                 strippedResponse = strippedResponse.withRemovedHeader(headerName)
                             }
                         }
