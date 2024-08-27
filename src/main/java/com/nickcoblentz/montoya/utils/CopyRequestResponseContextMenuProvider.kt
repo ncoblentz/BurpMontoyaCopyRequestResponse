@@ -20,10 +20,12 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
     private val _MenuItemList: List<Component>
     private var currentEvent: ContextMenuEvent? = null
     private var currentWSEvent: WebSocketContextMenuEvent? = null
+    private var currentAuditEvent: AuditIssueContextMenuEvent? = null
     private var currentEventType = 0
 
     private val _EventTypeHTTP = 1
     private val _EventTypeWS = 2
+    private val _EventTypeAudit = 3
     private val _CopyRequestAndResponseName = "Full Rq/Rs"
     private val _CopyRequestAndResponseHeaderName = "Full Rq, Rs Header"
     private val _CopyURLAndResponseName = "URL, Rs"
@@ -119,6 +121,11 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
     }
 
     override fun provideMenuItems(event: AuditIssueContextMenuEvent): List<Component> {
+        currentAuditEvent = event
+        currentEventType = _EventTypeAudit
+        if (event.selectedIssues().isNotEmpty()) {
+            return _MenuItemList
+        }
         return emptyList<Component>()
     }
 
@@ -130,8 +137,12 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
     override fun actionPerformed(e: ActionEvent) {
         val copyMe = if (currentEventType == _EventTypeWS) {
             handleWSEvent(e)
-        } else {
+        }
+        else if(currentEventType == _EventTypeHTTP) {
             handleHTTPEvent(e)
+        }
+        else {
+            handleAuditEvent(e)
         }
 
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
@@ -164,6 +175,38 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
                 }
             }
         }
+
+        return copyMe
+    }
+
+    fun handleAuditEvent(e: ActionEvent?): StringBuilder {
+        val copyMe = StringBuilder()
+
+        currentAuditEvent?.let { event ->
+            for(selectedIssue in event.selectedIssues()) {
+                selectedIssue.requestResponses()?.let {
+                    requestResponses ->
+                    for(requestResponse in requestResponses) {
+                        copyMe.append(
+                            String.format(
+                                "**%s**\n\n",
+                                requestResponse.request().url()
+                            )
+                        )
+                        copyMe.append(this.surroundWithMarkdown(requestResponse.request().toString()))
+                        if(requestResponse.hasResponse())
+                            copyMe.append(this.surroundWithMarkdown(requestResponse.response().toString()))
+                    }
+                }
+                /* later
+                selectedIssue.collaboratorInteractions()?.let { interactions ->
+                    for(interaction in interactions) {
+                        interaction.
+                    }
+                }*/
+            }
+        }
+
 
         return copyMe
     }
