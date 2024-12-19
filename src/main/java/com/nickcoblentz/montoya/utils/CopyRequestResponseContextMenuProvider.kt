@@ -1,6 +1,7 @@
 package com.nickcoblentz.montoya.utils
 
 import burp.api.montoya.MontoyaApi
+import burp.api.montoya.core.ToolType
 import burp.api.montoya.http.message.HttpRequestResponse
 import burp.api.montoya.ui.contextmenu.*
 import com.nickcoblentz.montoya.LogLevel
@@ -33,6 +34,7 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
     private val _CopyRequestAndResponseIncludeName = "Full Rq/Rs (incl. all)"
     private val _CopyURLAndResponseHeaderIncludeName = "URL, Rs Header (incl. all)"
     private val _CopyResponseBodyOnlyName = "Rs Body Only"
+    private val _StripHeadersName = "Strip Headers"
     private val _StripHeadersForTheseCommands: List<String> = listOf(_CopyRequestAndResponseName,_CopyRequestAndResponseHeaderName,_CopyURLAndResponseName,_CopyURLAndResponseHeaderName)
 
     private val _CopyRequestAndResponseJMenuItem = JMenuItem(_CopyRequestAndResponseName)
@@ -80,7 +82,11 @@ class CopyRequestResponseContextMenuProvider(private val _api: MontoyaApi) : Con
         "Strict-Transport-Security",
         "Last-Modified",
         "Vary",
-        "X-Ua-Compatible"
+        "X-Ua-Compatible",
+        "Report-To",
+        "Nel",
+        "Reporting-Endpoints",
+        "Etag"
     )
 
     var logger: MontoyaLogger = MontoyaLogger(_api, LogLevel.DEBUG)
