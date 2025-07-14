@@ -1,7 +1,7 @@
 plugins {
     //id("java")
     //`maven-publish`
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.2.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("com.github.ben-manes.versions") version "0.51.0" //Gradle -> Help -> dependencyUpdates
 }
@@ -14,7 +14,6 @@ repositories {
     mavenCentral()
     maven(url="https://jitpack.io") {
         content {
-            includeGroup("com.github.milchreis")
             includeGroup("com.github.ncoblentz")
         }
     }
@@ -23,9 +22,8 @@ repositories {
 dependencies {
     //testImplementation(platform("org.junit:junit-bom:5.9.1"))
     //testImplementation("org.junit.jupiter:junit-jupiter")
-    implementation("net.portswigger.burp.extensions:montoya-api:2025.3")
-    implementation("com.github.ncoblentz:BurpMontoyaLibrary:0.1.13")
-    implementation("com.github.milchreis:uibooster:1.21.1")
+    implementation("net.portswigger.burp.extensions:montoya-api:2025.6")
+    implementation("com.github.ncoblentz:BurpMontoyaLibrary:0.2.0")
     //implementation(kotlin("stdlib-jdk8"))
 
 }
